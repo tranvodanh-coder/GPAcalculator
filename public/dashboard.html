@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - webGPA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Toastify -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="text-gray-800" style="font-family: 'Inter', sans-serif;">
+
+    <!-- Navbar -->
+    <nav class="bg-indigo-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl font-bold tracking-tight">webGPA 🎓</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="userNameDisplay" class="font-medium hidden sm:inline-block">Xin chào, User</span>
+                    <button id="logoutBtn" class="bg-indigo-500 hover:bg-indigo-400 px-4 py-2 rounded-lg text-sm font-medium transition-colors">Đăng Xuất</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- Tổng quan -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card rounded-xl p-6 shadow-sm border-l-4 border-indigo-500 fade-in" style="animation-delay: 0.1s;">
+                <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider">Tổng Tín Chỉ</h3>
+                <p id="totalCredits" class="text-4xl font-bold text-gray-800 mt-2">0</p>
+            </div>
+            <div class="glass-card rounded-xl p-6 shadow-sm border-l-4 border-blue-500 fade-in" style="animation-delay: 0.2s;">
+                <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider">CPA (Hệ 10)</h3>
+                <p id="cpa10" class="text-4xl font-bold text-blue-600 mt-2">0.00</p>
+            </div>
+            <div class="glass-card rounded-xl p-6 shadow-sm border-l-4 border-emerald-500 fade-in" style="animation-delay: 0.3s;">
+                <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider">CPA (Hệ 4)</h3>
+                <p id="cpa4" class="text-4xl font-bold text-emerald-600 mt-2">0.00</p>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Cột trái: Form nhập liệu & Dự báo -->
+            <div class="lg:col-span-1 space-y-8 fade-in" style="animation-delay: 0.4s;">
+                
+                <!-- Box Thêm môn học -->
+                <div class="custom-box bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Thêm Môn Học
+                    </h2>
+                    <form id="subjectForm" class="space-y-4">
+                        <input type="hidden" id="subjectId">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Tên môn học</label>
+                            <input type="text" id="subName" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Số tín chỉ</label>
+                                <input type="number" id="subCredits" min="1" max="10" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Điểm (hệ 10)</label>
+                                <input type="number" step="0.1" min="0" max="10" id="subScore" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Học kỳ</label>
+                            <input type="text" id="subSemester" placeholder="VD: Kỳ 1 - 2024" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" id="saveSubBtn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition">Lưu Môn Học</button>
+                            <button type="button" id="cancelEditBtn" class="hidden w-full bg-gray-200 text-gray-800 py-2 rounded-lg font-medium hover:bg-gray-300 transition">Hủy</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Box Dự báo GPA -->
+                <div class="custom-box bg-gradient-to-br from-indigo-50 to-white rounded-xl shadow-sm p-6 border border-indigo-100">
+                    <h2 class="text-xl font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        Dự báo & Lộ trình
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">CPA mục tiêu (Hệ 4.0)</label>
+                            <input type="number" step="0.1" min="0" max="4" id="targetCpa" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="VD: 3.2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Số tín chỉ còn lại</label>
+                            <input type="number" min="1" id="remainingCredits" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="VD: 40">
+                        </div>
+                        <button id="predictBtn" class="w-full bg-indigo-100 text-indigo-700 py-2 rounded-lg font-bold hover:bg-indigo-200 transition">Tính toán</button>
+                        
+                        <div id="predictionResult" class="hidden mt-4 p-4 rounded-lg text-sm bg-white border border-indigo-200 shadow-inner">
+                            <!-- Kết quả đổ vào đây -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Cột phải: Bảng điểm & Biểu đồ -->
+            <div class="lg:col-span-2 space-y-8 fade-in" style="animation-delay: 0.5s;">
+                
+                <!-- Biểu đồ -->
+                <div class="custom-box bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Biểu Đồ GPA Theo Học Kỳ</h2>
+                    <div class="relative h-64 w-full">
+                        <canvas id="gpaChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bảng điểm -->
+                <div class="custom-box bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-gray-800">Chi Tiết Bảng Điểm</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Học Kỳ</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Môn Học</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">TC</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Điểm (10)</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Điểm (4) / Chữ</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Dữ liệu render qua JS -->
+                            </tbody>
+                        </table>
+                        <div id="emptyState" class="hidden text-center py-10">
+                            <p class="text-gray-500">Chưa có môn học nào. Hãy thêm môn học ở bên trái.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/calculator.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - webGPA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Toastify cho thông báo -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100" style="font-family: 'Inter', sans-serif;">
+
+    <div class="glass-panel p-8 rounded-2xl shadow-xl w-full max-w-md transition-all duration-300">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-indigo-600 mb-2">webGPA 🎓</h1>
+            <p class="text-gray-500">Quản lý điểm số & lộ trình học tập</p>
+        </div>
+
+        <!-- Form Đăng Nhập -->
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Tên đăng nhập</label>
+                <input type="text" id="username" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Nhập username">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                <input type="password" id="password" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="••••••••">
+            </div>
+            
+            <button type="submit" id="submitBtn" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                Đăng Nhập
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm">
+            <p class="text-gray-600">
+                <span id="toggleTextMsg">Chưa có tài khoản?</span> 
+                <button type="button" id="toggleModeBtn" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none">Đăng ký ngay</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+</body>
+</html>

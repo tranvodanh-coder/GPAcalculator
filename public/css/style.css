@@ -1,0 +1,101 @@
+/* public/css/style.css */
+
+/* --- Nền tổng thể rõ rệt hơn --- */
+body {
+    background-color: #e0e7ff;
+    background-image: linear-gradient(135deg, #e0e7ff 0%, #dbeafe 50%, #f3e8ff 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* --- Tùy chỉnh thanh cuộn (Scrollbar) mượt mà --- */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f8fafc; 
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
+
+/* --- Tối ưu Class Kính (Glassmorphism) cực đẹp --- */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Hiệu ứng xuất hiện mượt mà (Fade In Up) --- */
+.fade-in {
+    opacity: 0;
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Hiệu ứng bảng dữ liệu --- */
+tbody tr {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+/* --- Nâng cấp Input và Button (Micro-interactions) --- */
+input, select, textarea {
+    transition: all 0.3s ease;
+}
+input:focus {
+    transform: scale(1.01);
+}
+
+button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+button:hover {
+    transform: translateY(-2px);
+}
+button:active {
+    transform: scale(0.96) translateY(0);
+}
+
+/* Các box chung */
+.custom-box {
+    border: 1px solid #e2e8f0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.custom-box:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
