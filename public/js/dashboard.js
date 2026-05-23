@@ -29,7 +29,96 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelEditBtn = document.getElementById('cancelEditBtn');
     const saveSubBtn = document.getElementById('saveSubBtn');
 
-    // Khởi tạo data
+    // DOM Elements for Grade Breakdown
+    const componentsContainer = document.getElementById('componentsContainer');
+    const addComponentBtn = document.getElementById('addComponentBtn');
+    const totalWeightIndicator = document.getElementById('totalWeightIndicator');
+    const tempGpaDisplay = document.getElementById('tempGpaDisplay');
+
+    // Tạo một hàng nhập đầu điểm thành phần
+    function createComponentRow(name = '', score = '', weight = '') {
+        const row = document.createElement('div');
+        row.className = 'component-row grid grid-cols-12 gap-2 items-end bg-gray-50/50 p-2 rounded-lg border border-gray-100 relative group';
+        row.innerHTML = `
+            <div class="col-span-5">
+                <label class="block text-[10px] font-medium text-gray-400 mb-0.5">Tên thành phần</label>
+                <input type="text" placeholder="VD: Giữa kỳ" required value="${name}" class="comp-name block w-full px-2 py-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-xs">
+            </div>
+            <div class="col-span-3">
+                <label class="block text-[10px] font-medium text-gray-400 mb-0.5">Điểm (0-10)</label>
+                <input type="number" step="0.1" min="0" max="10" placeholder="0-10" required value="${score}" class="comp-score block w-full px-2 py-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-xs">
+            </div>
+            <div class="col-span-3">
+                <label class="block text-[10px] font-medium text-gray-400 mb-0.5">Trọng số (%)</label>
+                <input type="number" min="0" max="100" placeholder="%" required value="${weight}" class="comp-weight block w-full px-2 py-1 border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500 text-xs">
+            </div>
+            <div class="col-span-1 text-center">
+                <button type="button" class="remove-comp-btn text-red-500 hover:text-red-700 focus:outline-none py-1 px-1.5 rounded hover:bg-red-50 transition" title="Xóa đầu điểm">
+                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>
+        `;
+
+        // Gắn sự kiện tính điểm nhanh
+        row.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', updateRealtimePreview);
+        });
+
+        // Gắn sự kiện nút xóa hàng
+        row.querySelector('.remove-comp-btn').addEventListener('click', () => {
+            row.remove();
+            updateRealtimePreview();
+        });
+
+        componentsContainer.appendChild(row);
+    }
+
+    // Khởi tạo 3 đầu điểm mặc định
+    function initializeDefaultComponents() {
+        componentsContainer.innerHTML = '';
+        createComponentRow('Chuyên cần', '', 10);
+        createComponentRow('Giữa kỳ', '', 30);
+        createComponentRow('Cuối kỳ', '', 60);
+        updateRealtimePreview();
+    }
+
+    // Tính toán tổng trọng số và điểm GPA nháp realtime
+    function updateRealtimePreview() {
+        const rows = componentsContainer.querySelectorAll('.component-row');
+        let totalWeight = 0;
+        let totalWeightedScore = 0;
+
+        rows.forEach(row => {
+            const score = parseFloat(row.querySelector('.comp-score').value) || 0;
+            const weight = parseFloat(row.querySelector('.comp-weight').value) || 0;
+            totalWeight += weight;
+            totalWeightedScore += score * weight;
+        });
+
+        totalWeightIndicator.textContent = `Tổng TS: ${totalWeight}%`;
+        if (totalWeight === 100) {
+            totalWeightIndicator.className = 'text-xs text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full font-medium';
+        } else {
+            totalWeightIndicator.className = 'text-xs text-red-500 bg-red-50 px-2 py-0.5 rounded-full font-medium';
+        }
+
+        if (totalWeight > 0) {
+            tempGpaDisplay.textContent = (totalWeightedScore / totalWeight).toFixed(2);
+        } else {
+            tempGpaDisplay.textContent = '0.00';
+        }
+    }
+
+    // Sự kiện thêm đầu điểm
+    addComponentBtn.addEventListener('click', () => {
+        createComponentRow();
+        updateRealtimePreview();
+    });
+
+    // Khởi tạo các đầu điểm mặc định ban đầu
+    initializeDefaultComponents();
+
+    // Khởi tạo data từ backend
     fetchSubjects();
 
     // --- API Calls ---
@@ -63,11 +152,43 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const id = document.getElementById('subjectId').value;
+        const rows = componentsContainer.querySelectorAll('.component-row');
+        
+        const components = [];
+        let totalWeight = 0;
+
+        for (let row of rows) {
+            const name = row.querySelector('.comp-name').value.trim();
+            const score = parseFloat(row.querySelector('.comp-score').value);
+            const weight = parseFloat(row.querySelector('.comp-weight').value);
+
+            if (!name) {
+                showToast('Vui lòng nhập tên cho tất cả các đầu điểm!', 'error');
+                return;
+            }
+            if (isNaN(score) || score < 0 || score > 10) {
+                showToast('Điểm số phải từ 0 đến 10!', 'error');
+                return;
+            }
+            if (isNaN(weight) || weight < 0 || weight > 100) {
+                showToast('Trọng số phải từ 0 đến 100%!', 'error');
+                return;
+            }
+
+            components.push({ name, score, weight });
+            totalWeight += weight;
+        }
+
+        if (Math.round(totalWeight) !== 100) {
+            showToast(`Tổng trọng số phải bằng 100%! Hiện tại đang là ${totalWeight}%`, 'error');
+            return;
+        }
+
         const payload = {
             name: document.getElementById('subName').value.trim(),
             credits: parseInt(document.getElementById('subCredits').value),
-            score: parseFloat(document.getElementById('subScore').value),
-            semester: document.getElementById('subSemester').value.trim()
+            semester: document.getElementById('subSemester').value.trim(),
+            components: components
         };
 
         saveSubBtn.disabled = true;
@@ -98,8 +219,29 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('subjectId').value = sub.id;
         document.getElementById('subName').value = sub.name;
         document.getElementById('subCredits').value = sub.credits;
-        document.getElementById('subScore').value = sub.score;
         document.getElementById('subSemester').value = sub.semester;
+
+        // Render các đầu điểm động từ sub.components
+        componentsContainer.innerHTML = '';
+        if (sub.components && sub.components.length > 0) {
+            sub.components.forEach(comp => {
+                createComponentRow(comp.name, comp.score, comp.weight);
+            });
+        } else {
+            // Fallback cho bản ghi cũ
+            const scoreCc = sub.scoreCc !== null && sub.scoreCc !== undefined ? sub.scoreCc : 10;
+            const weightCc = sub.weightCc !== null && sub.weightCc !== undefined ? sub.weightCc : 10;
+            const scoreGk = sub.scoreGk !== null && sub.scoreGk !== undefined ? sub.scoreGk : 8;
+            const weightGk = sub.weightGk !== null && sub.weightGk !== undefined ? sub.weightGk : 30;
+            const scoreCk = sub.scoreCk !== null && sub.scoreCk !== undefined ? sub.scoreCk : 6;
+            const weightCk = sub.weightCk !== null && sub.weightCk !== undefined ? sub.weightCk : 60;
+
+            createComponentRow('Chuyên cần', scoreCc, weightCc);
+            createComponentRow('Giữa kỳ', scoreGk, weightGk);
+            createComponentRow('Cuối kỳ', scoreCk, weightCk);
+        }
+
+        updateRealtimePreview();
 
         saveSubBtn.textContent = 'Cập Nhật';
         cancelEditBtn.classList.remove('hidden');
@@ -124,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('subjectId').value = '';
         saveSubBtn.textContent = 'Lưu Môn Học';
         cancelEditBtn.classList.add('hidden');
+        initializeDefaultComponents();
     }
 
     // --- Renders ---
@@ -148,10 +291,24 @@ document.addEventListener('DOMContentLoaded', () => {
         subjects.forEach(sub => {
             const { letter, score4 } = calculator.convertScore(sub.score);
             
+            let breakdown = '';
+            if (sub.components && sub.components.length > 0) {
+                breakdown = `<div class="text-xs text-gray-400 mt-1">` + 
+                    sub.components.map(comp => `${comp.name}: ${comp.score} (${comp.weight}%)`).join(' | ') + 
+                    `</div>`;
+            } else if (sub.scoreCc !== null && sub.scoreCc !== undefined) {
+                breakdown = `<div class="text-xs text-gray-400 mt-1">CC: ${sub.scoreCc} (${sub.weightCc}%) | GK: ${sub.scoreGk} (${sub.weightGk}%) | CK: ${sub.scoreCk} (${sub.weightCk}%)</div>`;
+            } else {
+                breakdown = `<div class="text-xs text-gray-400 mt-1">Nhập trực tiếp (Cũ)</div>`;
+            }
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sub.semester}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sub.name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <div>${sub.name}</div>
+                    ${breakdown}
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">${sub.credits}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-blue-600 text-center">${sub.score}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-emerald-600 font-bold text-center">${score4} (${letter})</td>

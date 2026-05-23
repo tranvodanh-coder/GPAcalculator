@@ -9,15 +9,15 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 // Đăng ký (Register)
 router.post('/register', async (req, res) => {
     const { username, password } = req.body;
-    
+
     if (!username || !password) {
         return res.status(400).json({ message: 'Vui lòng nhập đầy đủ username và password.' });
     }
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        
-        db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function(err) {
+
+        db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function (err) {
             if (err) {
                 if (err.message.includes('UNIQUE constraint failed')) {
                     return res.status(400).json({ message: 'Username đã tồn tại. Vui lòng chọn tên khác.' });
@@ -54,7 +54,7 @@ router.post('/login', (req, res) => {
 
         // Tạo JWT Token
         const token = jwt.sign({ userId: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1d' });
-        
+
         res.json({
             message: 'Đăng nhập thành công',
             token,

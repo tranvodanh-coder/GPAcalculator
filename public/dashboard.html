@@ -72,13 +72,34 @@
                                 <input type="number" id="subCredits" min="1" max="10" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Điểm (hệ 10)</label>
-                                <input type="number" step="0.1" min="0" max="10" id="subScore" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <label class="block text-sm font-medium text-gray-700">Học kỳ</label>
+                                <input type="text" id="subSemester" placeholder="VD: Kỳ 1 - 2024" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Học kỳ</label>
-                            <input type="text" id="subSemester" placeholder="VD: Kỳ 1 - 2024" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+
+                        <!-- Điểm thành phần & Trọng số -->
+                        <div class="border-t border-gray-100 pt-3 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <label class="block text-sm font-semibold text-gray-800">Điểm thành phần & Trọng số</label>
+                                <span class="text-xs text-red-500 bg-red-50 px-2 py-0.5 rounded-full font-medium" id="totalWeightIndicator">Tổng TS: 0%</span>
+                            </div>
+                            
+                            <!-- Container chứa các đầu điểm động -->
+                            <div id="componentsContainer" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                                <!-- Hàng nhập đầu điểm sẽ được sinh ra ở đây -->
+                            </div>
+
+                            <!-- Nút Thêm đầu điểm -->
+                            <button type="button" id="addComponentBtn" class="w-full py-1.5 border border-dashed border-indigo-300 rounded-lg text-xs font-semibold text-indigo-600 bg-indigo-50/30 hover:bg-indigo-50 hover:border-indigo-400 transition flex items-center justify-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Thêm Đầu Điểm
+                            </button>
+
+                            <!-- GPA dự kiến -->
+                            <div class="bg-indigo-50/50 p-2 rounded-lg border border-indigo-100/50 flex justify-between items-center text-sm font-semibold">
+                                <span class="text-indigo-800">GPA (Hệ 10) tính toán:</span>
+                                <span id="tempGpaDisplay" class="text-indigo-600 text-base">0.00</span>
+                            </div>
                         </div>
                         <div class="flex gap-2">
                             <button type="submit" id="saveSubBtn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition">Lưu Môn Học</button>
